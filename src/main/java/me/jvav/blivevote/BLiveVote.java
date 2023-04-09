@@ -12,13 +12,12 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.voting.votes.OptionId;
+import net.minecraft.voting.votes.ServerVote;
 import net.minecraft.voting.votes.VoterMap;
 import top.hendrixshen.bilibilidanmaku.util.websocket.WebSocketManager;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
 import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
@@ -34,7 +33,10 @@ public class BLiveVote {
     private static MinecraftServer server;
 
     @Getter
-    private static final Map<Integer, Pair<UUID, Integer>> voteMap = new HashMap<>();
+    private static final Map<Integer, Map<OptionId, ServerVote.Option>> voteMap = new HashMap<>();
+
+    @Getter
+    private static final Map<Integer, List<String>> votedUsers = new HashMap<>();
 
     private final static String HELP_MESSAGE = """
         /bvote 获取帮助信息
@@ -84,15 +86,29 @@ public class BLiveVote {
         }
         String[] vote = danmaku.substring(1).split("-");
         int voteId = Integer.parseInt(vote[0]);
-        UUID uuid = UUID.nameUUIDFromBytes("BiliUser:%s".formatted(username).getBytes(StandardCharsets.UTF_8));
         int operationId = Integer.parseInt(vote[1]);
-        OptionId optionId = new OptionId(voteMap.get(voteId).getFirst(), operationId - 1);
 
-        VoterMap votes = ((ServerVoteStorageAccessor) server.getVoteStorage()).getVotes();
-        if (votes.getVotes(optionId, uuid) != 0) {
+        List<String> users = votedUsers.get(voteId);
+        if (users == null) {
+            votedUsers.put(voteId, Collections.singletonList(username));
+        } else if (users.contains(username)) {
+            return;
+        } else {
+            users.add(username);
+        }
+
+        Map<OptionId, ServerVote.Option> pair = voteMap.get(voteId);
+        if (pair == null || operationId > pair.size()) {
             return;
         }
-        votes.addVote(optionId, uuid, Component.literal(username), 1);
+
+        VoterMap votes = ((ServerVoteStorageAccessor) server.getVoteStorage()).getVotes();
+        pair.keySet().forEach(optionId -> {
+            if (optionId.index() == operationId - 1) {
+                votes.addVote(optionId, UUID.randomUUID(), Component.literal(username), 1);
+                return;
+            }
+        });
 
         broadcast(
             Component.empty()
