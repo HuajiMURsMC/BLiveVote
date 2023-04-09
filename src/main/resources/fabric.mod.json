@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "blivevote",
+  "version": "${version}",
+
+  "name": "BLive Vote",
+  "description": "发动广大的直播间工具人让《投票更新》成为 “真·投票更新”",
+  "authors": [
+    "Huaji_MUR233"
+  ],
+
+  "license": "LGPL-3.0-or-later",
+  "icon": "assets/blivevote/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.jvav.blivevote.BLiveVote"
+    ]
+  },
+  "mixins": [
+    "blivevote.mixins.json"
+  ],
+
+  "depends": {
+    "minecraft": "1.20-alpha.23.13.ab",
+    "java": ">=17"
+  }
+}
