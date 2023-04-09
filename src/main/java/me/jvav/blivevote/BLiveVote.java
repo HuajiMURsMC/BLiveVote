@@ -1,12 +1,14 @@
 package me.jvav.blivevote;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import me.jvav.blivevote.mixin.ServerVoteStorageAccessor;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.voting.votes.OptionId;
@@ -24,7 +26,7 @@ import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
 @Slf4j
-public class BLiveVote implements ModInitializer {
+public class BLiveVote {
     @Getter
     private static int roomId;
 
@@ -44,8 +46,8 @@ public class BLiveVote implements ModInitializer {
         disconnect();
     }
 
-    public static void registerCommand() {
-        CommandRegistrationCallback.EVENT.register(((dispatcher, registryAccess, environment) -> dispatcher.register(
+    public static void registerCommand(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess, Commands.CommandSelection environment) {
+        dispatcher.register(
             literal("bvote")
                 .requires(context -> context.hasPermission(4))
                 .then(
@@ -72,12 +74,7 @@ public class BLiveVote implements ModInitializer {
                     }
                     return 1;
                 })
-        )));
-    }
-
-    @Override
-    public void onInitialize() {
-        registerCommand();
+        );
     }
 
     public static void handleDanmaku(String username, String danmaku, boolean isGuard) {

@@ -21,7 +21,6 @@ dependencies {
 	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation include(fabricApi.module("fabric-command-api-v2", project.fabric_version))
 	modImplementation include("io.netty:netty-codec-http:${project.netty_codec_http_version}")
 }
 

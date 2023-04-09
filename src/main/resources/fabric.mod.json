@@ -14,9 +14,6 @@
 
   "environment": "*",
   "entrypoints": {
-    "main": [
-      "me.jvav.blivevote.BLiveVote"
-    ]
   },
   "mixins": [
     "blivevote.mixins.json"

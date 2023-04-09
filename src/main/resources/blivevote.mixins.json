@@ -5,7 +5,8 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "MinecraftServerMixin",
-    "ServerVoteStorageAccessor"
+    "ServerVoteStorageAccessor",
+    "CommandsMixin"
   ],
   "client": [
   ],
